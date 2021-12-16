@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
 export default class App extends React.Component {
   state={
@@ -8,6 +9,11 @@ export default class App extends React.Component {
   render(){
     return (
         <View style={styles.container}>
+          <TouchableOpacity
+          onPress={() => this.props.navigation.goBack()}
+          style={{position:'absolute', left:20, top:40}}>
+          <Feather name='arrow-left' size={24} color='black'/>
+        </TouchableOpacity>
              <Text style={styles.titleText}>Enter Confirmation Code</Text>
              <Text style={styles.baseText}>Enter the 6-digit code we sent to your email.</Text>
         <TouchableOpacity>
@@ -21,11 +27,8 @@ export default class App extends React.Component {
             placeholderTextColor="#707070"
             onChangeText={text => this.setState({code:text})}/>
         </View>
-        <TouchableOpacity style={styles.button}>
-        <Text onPress={() => this.props.navigation.navigate('Log In')}
-        style={styles.loginText}>
-            Next
-        </Text>
+        <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Reset Password')}>
+        <Text>Next</Text>
         </TouchableOpacity>
 
     </View>

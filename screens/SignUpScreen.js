@@ -1,25 +1,27 @@
 import React from 'react';
 import DatePicker from 'react-native-datepicker';
 import RNPickerSelect, { defaultStyles } from 'react-native-picker-select';  //npm install react-native-picker-select
-import { StyleSheet, Text, View, Picker, TextInput, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Picker, TextInput, TouchableOpacity, ScrollView, SafeAreaView, Button } from 'react-native';
 import moment from 'moment';
+import global from '../global';
+import { Feather } from '@expo/vector-icons';
 
 const gender = [
   {
     label: 'Male',
-    value: 'male',
+    value: 'Male',
   },
   {
     label: 'Female',
-    value: 'female',
+    value: 'Female',
   },
   {
     label: 'Others',
-    value: 'others',
+    value: 'Others',
   },
 ];
 
-export default class App extends React.Component {
+export default class SignUpScreen extends React.Component {
   constructor(props) {
     super(props);
 
@@ -28,13 +30,106 @@ export default class App extends React.Component {
       selectedGender0: null,
     };
     this.state = {
+      email: "",
+      username: "",
+      password: "",
+      error: '',
+      date: "",
+      UID: "",
       selectedGender: undefined,
+      loading: false,
     };
   }
 
   state = {
+    username: "",
     email: "",
     password: "",
+  }
+
+
+  storeInFirebase() {
+    const ref = global.firebase.database().ref('user').push();
+    const key = ref.key;
+    global.event = key;
+    ref.set({
+      userID: key,
+      UID: this.state.UID,
+      username: this.state.username,
+      email: this.state.email,
+      dob: this.state.date,
+      gender: this.state.selectedGender,
+      proimage: "https://firebasestorage.googleapis.com/v0/b/testfirebase-4f3dc.appspot.com/o/proimage%2Fblank-profile-picture.png?alt=media&token=07a92159-e50b-42cd-b9fd-5e1a4701b257",
+    }
+    )
+  };
+
+  onConfirmPress() {
+    this.setState({ error: '', loading: true });
+    if (this.state.username == '') {
+      alert('Username is required')
+      this.setState({ loading: false });
+    }
+    else if (this.state.email == '') {
+      alert('E-mail is required')
+      this.setState({ loading: false });
+    }
+    else if (this.state.password == '') {
+      alert('Password is required')
+      this.setState({ loading: false });
+    }
+    else if (this.state.password.length < 6) {
+      alert('Password must contain 6 or more characters')
+      this.setState({ loading: false });
+    }
+    else if (this.state.date == '') {
+      alert('Please input Date of birth')
+      this.setState({ loading: false });
+    }
+    else if (this.state.selectedGender == undefined) {
+      alert('Please input Gender')
+      this.setState({ loading: false });
+    }
+    else {
+      const { email, password } = this.state;
+      global.firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then(data => {
+          this.setState({ UID: data.user.uid })
+          this.setState({ error: '', loading: false });
+          this.storeInFirebase();
+          alert("Please log in");
+          this.props.navigation.replace("Log In");
+        })
+        .catch(() => {
+          this.setState({ error: '', loading: false });
+          alert("The user with this email is already existed.")
+        });
+
+    }
+  }
+
+  renderButtonOrLoading() {
+    if (this.state.loading) {
+      return <Text>Loading</Text>
+    }
+    return <TouchableOpacity
+      style={styles.loginBtn}
+      onPress={this.onConfirmPress.bind(this)}>
+      <Text> Confirm </Text>
+    </TouchableOpacity>
+  }
+
+  back() {
+    this.props.navigation.goBack("Log In");
+  }
+
+  backbutton() {
+    return (
+      <TouchableOpacity
+        onPress={this.back.bind(this)}
+        style={{ position: 'absolute', left: 20, top: 40 }}>
+        <Feather name='arrow-left' size={24} color='black' />
+      </TouchableOpacity>)
   }
 
   render() {
@@ -47,6 +142,7 @@ export default class App extends React.Component {
     return (
 
       <SafeAreaView style={styles.container}>
+        {this.backbutton()}
         <View style={styles.signUpView}>
           <Text style={styles.signUpText}> Sign Up</Text>
         </View>
@@ -62,6 +158,7 @@ export default class App extends React.Component {
             style={styles.inputText}
             placeholder="Email"
             placeholderTextColor="#707070"
+            keyboardType="email-address"
             onChangeText={text => this.setState({ email: text })} />
         </View>
         <View style={styles.inputView} >
@@ -97,7 +194,6 @@ export default class App extends React.Component {
             placeholderText: {
               color: "#707070"
             }
-
           }}
           onDateChange={(date) => {
             this.setState({ date: date });
@@ -124,10 +220,8 @@ export default class App extends React.Component {
             this.inputRefs.selectedGender = el;
           }}
         />
-        <TouchableOpacity
-          style={styles.loginBtn}>
-          <Text> Confirm </Text>
-        </TouchableOpacity>
+        <Text>{this.state.error}</Text>
+        {this.renderButtonOrLoading()}
       </SafeAreaView>
     );
   }

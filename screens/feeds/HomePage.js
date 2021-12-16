@@ -1,66 +1,27 @@
 import * as React from 'react';
-import MapView from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialIcons } from '@expo/vector-icons'; 
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-
-function Map() {
-    return (
-    <View style={styles.container}>
-        <MapView 
-        style={styles.mapStyle} 
-        showsUserLocation
-        showsMyLocationButton/>
-      </View>
-    );
-  }
-
-function Create() {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Create!</Text>
-      </View>
-    );
-  }
-
-function Home() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Feed!</Text>
-    </View>
-  );
-}
-
-function Profile() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Profile!</Text>
-    </View>
-  );
-}
-
-function Chat() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Chat!</Text>
-    </View>
-  );
-}
+import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import MapScreen from '../MapScreen';
+import HomeScreen from './HomeScreen';
+import CreateScreen from './CreateEvent';
+import Profile from './Profile';
+import Chat from './Chat';
 
 const Tab = createBottomTabNavigator();
 
 export default function MyTabs() {
   return (
     <Tab.Navigator
-      initialRouteName="Feed"
+      initialRouteName="Home"
       tabBarOptions={{
         activeTintColor: '#FBAF02',
       }}
     >
-    <Tab.Screen
+      <Tab.Screen
         name="Map"
-        component={Map}
+        component={MapScreen}
         options={{
           tabBarLabel: 'Map',
           tabBarIcon: ({ color, size }) => (
@@ -68,9 +29,9 @@ export default function MyTabs() {
           ),
         }}
       />
-    <Tab.Screen
+      <Tab.Screen
         name="Create"
-        component={Create}
+        component={CreateScreen}
         options={{
           tabBarLabel: 'Create',
           tabBarIcon: ({ color, size }) => (
@@ -78,9 +39,9 @@ export default function MyTabs() {
           ),
         }}
       />
-    <Tab.Screen
+      <Tab.Screen
         name="Home"
-        component={Home}
+        component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color, size }) => (
@@ -88,7 +49,7 @@ export default function MyTabs() {
           ),
         }}
       />
-    <Tab.Screen
+      <Tab.Screen
         name="Chat"
         component={Chat}
         options={{
@@ -98,7 +59,7 @@ export default function MyTabs() {
           ),
         }}
       />
-    <Tab.Screen
+      <Tab.Screen
         name="Profile"
         component={Profile}
         options={{
@@ -113,14 +74,14 @@ export default function MyTabs() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    mapStyle: {
-      width: Dimensions.get('window').width,
-      height: Dimensions.get('window').height,
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mapStyle: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
+  },
+});
